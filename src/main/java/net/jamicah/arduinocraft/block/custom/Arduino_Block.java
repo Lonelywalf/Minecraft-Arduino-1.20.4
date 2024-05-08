@@ -19,6 +19,9 @@ public class Arduino_Block extends Block {
         if (world.isReceivingRedstonePower(pos)) {
             // whatever happens if the block is powered
             Arduinocraft.LOGGER.info("Redstone ON");
+            // TODO: add the code here
+        } else {
+            Arduinocraft.LOGGER.info("Redstone OFF");
         }
         super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
     }
