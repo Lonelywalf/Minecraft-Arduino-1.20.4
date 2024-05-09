@@ -3,60 +3,49 @@ package net.jamicah.arduinocraft.arduino;
 
 import com.fazecast.jSerialComm.SerialPort;
 import net.jamicah.arduinocraft.Arduinocraft;
+import net.jamicah.arduinocraft.Chat;
+
 import java.io.IOException;
+import java.io.Serial;
+
 public class SerialCom {
     public SerialPort comPort;
+    public static Boolean isOpened = false;
+
+    // set up the serial port
     public SerialCom(String port) {
         this.comPort = SerialPort.getCommPort(port);
         comPort.setComPortParameters(9600, 8, 1, 0);
         comPort.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 0, 0);
 
         if (comPort.openPort()) {
-            System.out.println("Port is opened");
+            Chat.sendMessage("§aCommunication successfully started");
+            isOpened = true;
         } else {
-            System.out.println("Something went wrong");
-            return;
+            Chat.sendMessage("§cSomething went wrong, the inputted port might be wrong");
+            isOpened = false;
         }
     }
-    private static void digitalWrite(SerialPort com, Integer in) {
+
+    // write to the serial port
+    public static void digitalWrite(SerialPort com, Integer signal) {
         try {
-            com.getOutputStream().write(in.byteValue());
+            com.getOutputStream().write(signal.byteValue());
         } catch (IOException e) {
-            e.printStackTrace();
+            Chat.sendMessage("An error has occurred. Debug info: " + e);
         }
         try {
             com.getOutputStream().flush();
         } catch (IOException e) {
-            e.printStackTrace();
+            Chat.sendMessage("An error has occurred. Debug info: " + e);
         }
-    }
-    public static void sendToArduino(int signal, SerialPort comPort) {
-
-
-
-
-        /*
-        for (Integer i = 50; i < 53; i++) {
-            comPort.getOutputStream().write(i.byteValue());
-            comPort.getOutputStream().flush();
-            System.out.println("Input: " + i);
-            Thread.sleep(1000);
-        }
-         */
-
-        digitalWrite(comPort, signal);
-
-
-
-
-
-
     }
     public static void closePort(SerialPort comPort) {
         if (comPort.closePort()) {
-            System.out.println("Port closed.");
+            Arduinocraft.LOGGER.info("Successfully closed Serial Communication");
+            isOpened = false;
         } else {
-            System.out.println("uhhhh idk closing didn't work");
+            Arduinocraft.LOGGER.info("An error has occurred while trying to close the Serial Communication");
         }
     }
 }
