@@ -6,17 +6,21 @@ import net.jamicah.arduinocraft.Arduinocraft;
 import net.jamicah.arduinocraft.Chat;
 
 import java.io.IOException;
-import java.io.Serial;
+import java.io.InputStream;
 
 public class SerialCom {
     public SerialPort comPort;
+    public InputStream comPortIn;
     public static Boolean isOpened = false;
+    public static Boolean isReceivingInput = false;
 
     // set up the serial port
     public SerialCom(String port) {
         this.comPort = SerialPort.getCommPort(port);
         comPort.setComPortParameters(9600, 8, 1, 0);
         comPort.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 0, 0);
+
+        comPortIn = comPort.getInputStream();
 
         if (comPort.openPort()) {
             Chat.sendMessage("§aCommunication successfully started");
@@ -40,6 +44,28 @@ public class SerialCom {
             Chat.sendMessage("An error has occurred. Debug info: " + e);
         }
     }
+
+    public static Boolean digitalRead(InputStream in) {
+        if (readSignal(in)) {
+            return true;
+        }
+        return false;
+    }
+
+    public static Boolean readSignal(InputStream in) {
+        int read;
+        try {
+            if (in.available() > 0) {
+                read = in.read();
+                Arduinocraft.LOGGER.info(String.valueOf(read));
+                return true;
+            }
+        } catch (IOException e) {
+            Chat.sendMessage("§cAn error has occurred while trying to read Arduino's signal");
+        }
+        return false;
+    }
+
     public static void closePort(SerialPort comPort) {
         if (comPort.closePort()) {
             Arduinocraft.LOGGER.info("Successfully closed Serial Communication");
