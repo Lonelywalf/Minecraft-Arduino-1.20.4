@@ -6,13 +6,22 @@ import net.jamicah.arduinocraft.Arduinocraft;
 import net.jamicah.arduinocraft.arduino.SerialCom;
 import net.minecraft.client.world.ClientWorld;
 
+import java.io.IOException;
+
 public class SerialRead implements ClientTickEvents.EndWorldTick {
 
 
     @Override
     public void onEndTick(ClientWorld world) {
+
         if (SerialCom.isOpened) {
             SerialCom.isReceivingInput = SerialCom.digitalRead(Arduinocraft.comPort.comPortIn);
+
+            if (SerialCom.isReceivingInput) {
+                Arduinocraft.LOGGER.info("Pressed down!!");
+            }
+
         }
+
     }
 }

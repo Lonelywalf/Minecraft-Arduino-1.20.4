@@ -45,20 +45,17 @@ public class SerialCom {
         }
     }
 
-    public static Boolean digitalRead(InputStream in) {
-        if (readSignal(in)) {
-            return true;
-        }
-        return false;
-    }
 
-    public static Boolean readSignal(InputStream in) {
+
+    public static Boolean digitalRead(InputStream in) {
         int read;
         try {
             if (in.available() > 0) {
                 read = in.read();
                 Arduinocraft.LOGGER.info(String.valueOf(read));
                 return true;
+                // FIXME: in.read() receives every single button press. maybe fix it by making the button only send a single serial print when pressed down, instead of every single time
+                // FIXME: also, find a way to optimize the reading
             }
         } catch (IOException e) {
             Chat.sendMessage("§cAn error has occurred while trying to read Arduino's signal");
