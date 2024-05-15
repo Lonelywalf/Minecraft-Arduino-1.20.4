@@ -6,9 +6,12 @@ import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.jamicah.arduinocraft.Arduinocraft;
 import net.jamicah.arduinocraft.arduino.SerialCom;
+import net.jamicah.arduinocraft.block.custom.Arduino_Block;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
+import net.minecraft.world.World;
 
 
 import static com.mojang.brigadier.builder.RequiredArgumentBuilder.argument;
@@ -20,21 +23,46 @@ public class Commands {
 
         // /serial start <port name>
         CommandRegistrationCallback.EVENT.register(((dispatcher, registryAccess, environment) -> dispatcher.register(literal("arduino")
-                .then(literal("start")
-                        .then(CommandManager.argument("select port", StringArgumentType.string())
-                                .executes(context -> {
+                        .executes(context -> {
+                            if (!SerialCom.isReceivingInput) {
+                                SerialCom.isReceivingInput = true;
 
-                            // open selected port
-                            if (!SerialCom.isOpened) {
-                                final String input = StringArgumentType.getString(context, "select port");
-                                context.getSource().sendFeedback(() -> Text.literal("[ArduinoCraft] §oSelected \'" + input + "\'"), false);
-                                Arduinocraft.comPort = new SerialCom(input);
                             } else {
-                                context.getSource().sendFeedback(() -> Text.literal("[ArduinoCraft] Error. Arduino communication has already started"), false);
+                                SerialCom.isReceivingInput = false;
                             }
 
                             return 1;
-                        }))
+                        })
+                .then(literal("start")
+                        .then(CommandManager.argument("select port", StringArgumentType.string())
+                                .then(literal("output")
+                                        .executes(context -> {
+
+                                            // open selected port & make the block OUTPUT only (Arduino to Minecraft)
+                                            if (!SerialCom.isOpened) {
+                                                final String input = StringArgumentType.getString(context, "select port");
+                                                context.getSource().sendFeedback(() -> Text.literal("[ArduinoCraft] §oSelected \'" + input + "\'"), false);
+                                                Arduinocraft.comPort = new SerialCom(input);
+
+                                            } else {
+                                                context.getSource().sendFeedback(() -> Text.literal("[ArduinoCraft] Error. Arduino communication has already started"), false);
+                                            }
+                                            Arduino_Block.isInput = false;
+                                            return 1;
+                                }))
+                                .then(literal("input")
+                                        .executes(context -> {
+                                            // open selected port & make the block INPUT only (Minecraft -> Arduino)
+                                            if (!SerialCom.isOpened) {
+                                                final String input = StringArgumentType.getString(context, "select port");
+                                                context.getSource().sendFeedback(() -> Text.literal("[ArduinoCraft] §oSelected \'" + input + "\'"), false);
+                                                Arduinocraft.comPort = new SerialCom(input);
+                                            } else {
+                                                context.getSource().sendFeedback(() -> Text.literal("[ArduinoCraft] Error. Arduino communication has already started"), false);
+                                            }
+                                            Arduino_Block.isInput = true;
+                                            return 1;
+                                        })))
                 ).then(literal("stop")
                         .executes(context -> {
                             if (SerialCom.isOpened) {

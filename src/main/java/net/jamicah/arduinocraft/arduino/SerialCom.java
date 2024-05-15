@@ -52,15 +52,21 @@ public class SerialCom {
         try {
             if (in.available() > 0) {
                 read = in.read();
-                Arduinocraft.LOGGER.info(String.valueOf(read));
-                return true;
-                // FIXME: in.read() receives every single button press. maybe fix it by making the button only send a single serial print when pressed down, instead of every single time
-                // FIXME: also, find a way to optimize the reading
+
+                if (read == 51) {
+                    Arduinocraft.LOGGER.info("receiving signal HIGH");
+                    return true;
+                } else if (read == 52) {
+                    Arduinocraft.LOGGER.info("receiving signal LOW");
+                    return false;
+                }
+
+
             }
         } catch (IOException e) {
             Chat.sendMessage("§cAn error has occurred while trying to read Arduino's signal");
         }
-        return false;
+        return null;
     }
 
     public static void closePort(SerialPort comPort) {
