@@ -15,9 +15,9 @@ public class SerialCom {
     public static Boolean isReceivingInput = false;
 
     // set up the serial port
-    public SerialCom(String port) {
+    public SerialCom(String port, int baudrate) {
         this.comPort = SerialPort.getCommPort(port);
-        comPort.setComPortParameters(9600, 8, 1, 0);
+        comPort.setComPortParameters(baudrate, 8, 1, 0);
         comPort.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 0, 0);
 
         comPortIn = comPort.getInputStream();

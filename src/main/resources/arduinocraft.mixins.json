@@ -1,9 +1,9 @@
 {
-	"required": true,
+	"required": false,
 	"package": "net.jamicah.arduinocraft.mixin",
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
-		"ArduinocraftMixin"
+
 	],
 	"injectors": {
 		"defaultRequire": 1

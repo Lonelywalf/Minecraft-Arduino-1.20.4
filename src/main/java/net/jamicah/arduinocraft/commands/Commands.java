@@ -36,33 +36,40 @@ public class Commands {
                 .then(literal("start")
                         .then(CommandManager.argument("select port", StringArgumentType.string())
                                 .then(literal("output")
-                                        .executes(context -> {
+                                                .then(CommandManager.argument("Baudrate", IntegerArgumentType.integer())
+                                                        .executes(context -> {
 
-                                            // open selected port & make the block OUTPUT only (Arduino to Minecraft)
-                                            if (!SerialCom.isOpened) {
-                                                final String input = StringArgumentType.getString(context, "select port");
-                                                context.getSource().sendFeedback(() -> Text.literal("[ArduinoCraft] §oSelected \'" + input + "\'"), false);
-                                                Arduinocraft.comPort = new SerialCom(input);
+                                                            // open selected port & make the block OUTPUT only (Arduino to Minecraft)
+                                                            if (!SerialCom.isOpened) {
+                                                                final Integer baudrate = IntegerArgumentType.getInteger(context, "Baudrate");
+                                                                final String input = StringArgumentType.getString(context, "select port");
+                                                                context.getSource().sendFeedback(() -> Text.literal("[ArduinoCraft] §oSelected \'" + input + "\' with the baudrate of " + baudrate), false);
+                                                                Arduinocraft.comPort = new SerialCom(input, baudrate);
 
-                                            } else {
-                                                context.getSource().sendFeedback(() -> Text.literal("[ArduinoCraft] Error. Arduino communication has already started"), false);
-                                            }
-                                            Arduino_Block.isInput = false;
-                                            return 1;
-                                }))
+                                                            } else {
+                                                                context.getSource().sendFeedback(() -> Text.literal("[ArduinoCraft] Error. Arduino communication has already started"), false);
+                                                            }
+                                                            Arduino_Block.isInput = false;
+                                                            return 1;
+                                                        }))
+                                        )
                                 .then(literal("input")
-                                        .executes(context -> {
-                                            // open selected port & make the block INPUT only (Minecraft -> Arduino)
-                                            if (!SerialCom.isOpened) {
-                                                final String input = StringArgumentType.getString(context, "select port");
-                                                context.getSource().sendFeedback(() -> Text.literal("[ArduinoCraft] §oSelected \'" + input + "\'"), false);
-                                                Arduinocraft.comPort = new SerialCom(input);
-                                            } else {
-                                                context.getSource().sendFeedback(() -> Text.literal("[ArduinoCraft] Error. Arduino communication has already started"), false);
-                                            }
-                                            Arduino_Block.isInput = true;
-                                            return 1;
-                                        })))
+                                        .then(CommandManager.argument("Baudrate", IntegerArgumentType.integer())
+                                                .executes(context -> {
+
+                                                    // open selected port & make the block OUTPUT only (Arduino to Minecraft)
+                                                    if (!SerialCom.isOpened) {
+                                                        final Integer baudrate = IntegerArgumentType.getInteger(context, "Baudrate");
+                                                        final String input = StringArgumentType.getString(context, "select port");
+                                                        context.getSource().sendFeedback(() -> Text.literal("[ArduinoCraft] §oSelected \'" + input + "\' with the baudrate of " + baudrate), false);
+                                                        Arduinocraft.comPort = new SerialCom(input, baudrate);
+
+                                                    } else {
+                                                        context.getSource().sendFeedback(() -> Text.literal("[ArduinoCraft] Error. Arduino communication has already started"), false);
+                                                    }
+                                                    Arduino_Block.isInput = true;
+                                                    return 1;
+                                                }))))
                 ).then(literal("stop")
                         .executes(context -> {
                             if (SerialCom.isOpened) {
