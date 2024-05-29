@@ -11,7 +11,6 @@ import net.minecraft.util.Identifier;
 
 
 public class ModBlockEntities {
-    // FIXME: Block has no block entity, it is invisible
     public static final BlockEntityType<Arduino_BlockEntity> ARDUINO_BLOCK_ENTITY =
             Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier(Arduinocraft.MOD_ID, "arduino_block_entity"),
                     FabricBlockEntityTypeBuilder.create(Arduino_BlockEntity::new, ModBlocks.ARDUINO_BLOCK).build());
