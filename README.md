@@ -14,7 +14,7 @@ Please note that this is my first mod and I'm still learning how to make mods, s
 ## How to use
 
 ### Upload the sketch
-Upload the provided [sketch](arduino/example.ino) to your Arduino, and connect the pins like this:
+Upload the provided [sketch](arduino/example.ino) to your Arduino using the Arduino IDE (or what you use to upload), and connect the pins like this:
 
 ![image](arduino/circuit.png)
 
@@ -33,6 +33,6 @@ The mod uses the [jSerialComm](https://fazecast.github.io/jSerialComm/) library 
 When you use input, the mod will send a signal to the Arduino everytime the block receives redstone power to write high or low to the pin. 
 
 When you use output, the mod will read if the pin is high or low and send a redstone signal to the block.
-
+## Can I
 
 TODO: make proper README.md
