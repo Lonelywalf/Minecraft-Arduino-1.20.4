@@ -63,7 +63,7 @@ public class Arduino_Block extends BlockWithEntity {
 
             // if receiving redstone power when port isn't opened
         } else if (world.isReceivingRedstonePower(pos) && !SerialCom.isOpened && !SerialCom.hasSentArduinoMessage) {
-            Chat.sendMessage("§cArduino communication is disabled. Enable it by using /arduino start <port>");
+            Chat.sendMessage("§cArduino communication is disabled. Enable it by using /arduino start <port> <input/output> <baudrate>");
             SerialCom.hasSentArduinoMessage = true;
         }
 
