@@ -33,6 +33,8 @@ The mod uses the [jSerialComm](https://fazecast.github.io/jSerialComm/) library 
 When you use input, the mod will send a signal to the Arduino everytime the block receives redstone power to write high or low to the pin. 
 
 When you use output, the mod will read if the pin is high or low and send a redstone signal to the block.
-## Can I
+## Can I change the circuit?
+Yes, since the mod only sends a signal to the Arduino, you can change the circuit to your desire.
+Look into the [sketch](arduino/example.ino) to see how the communication works.
 
 TODO: make proper README.md
