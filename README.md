@@ -1,5 +1,7 @@
 # ArduinoCraft
 A mod that converts a redstone signal into Arduino's ```digitalWrite()```.
+
+Please note that this is my first mod and I'm still learning how to make mods, so there might be some bugs or issues.
 ## Current feature(s)
 - A block called "Arduino Block" which takes redstone signals and converts it to ```digitalWrite()```
 - Convert real life signals to redstone with ```digitalRead()```
