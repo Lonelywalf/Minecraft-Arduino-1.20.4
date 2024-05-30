@@ -20,9 +20,6 @@
 		],
 		"client": [
 			"net.jamicah.arduinocraft.ArduinocraftClient"
-		],
-		"fabric-datagen": [
-			"net.jamicah.arduinocraft.ArduinocraftDataGenerator"
 		]
 	},
 	"mixins": [

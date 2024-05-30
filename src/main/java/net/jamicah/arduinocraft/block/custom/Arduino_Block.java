@@ -13,10 +13,6 @@ import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
@@ -66,8 +62,9 @@ public class Arduino_Block extends BlockWithEntity {
             SerialCom.digitalWrite(Arduinocraft.comPort.comPort, 0);
 
             // if receiving redstone power when port isn't opened
-        } else if (world.isReceivingRedstonePower(pos) && !SerialCom.isOpened) {
+        } else if (world.isReceivingRedstonePower(pos) && !SerialCom.isOpened && !SerialCom.hasSentArduinoMessage) {
             Chat.sendMessage("§cArduino communication is disabled. Enable it by using /arduino start <port>");
+            SerialCom.hasSentArduinoMessage = true;
         }
 
         super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);

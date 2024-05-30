@@ -24,8 +24,12 @@ public class Arduinocraft implements ModInitializer {
 		ModBlocks.registerModBlocks();
 		ModItems.registerModItems();
 		ModBlockEntities.registerModBlockEntities();
+
 		ClientTickEvents.END_WORLD_TICK.register(new SerialRead());
+
 		ServerLifecycleEvents.SERVER_STOPPED.register(new SerialRead());
+
+
 		Commands.registerCommands();
 
 		// close port

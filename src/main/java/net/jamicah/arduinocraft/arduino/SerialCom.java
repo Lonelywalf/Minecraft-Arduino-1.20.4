@@ -13,6 +13,7 @@ public class SerialCom {
     public InputStream comPortIn;
     public static Boolean isOpened = false;
     public static Boolean isReceivingInput = false;
+    public static Boolean hasSentArduinoMessage = false;
 
     // set up the serial port
     public SerialCom(String port, int baudrate) {
@@ -49,10 +50,10 @@ public class SerialCom {
 
     public static Boolean digitalRead(InputStream in) {
         int read;
+
         try {
             if (in.available() > 0) {
                 read = in.read();
-
                 if (read == 51) {
                     Arduinocraft.LOGGER.info("receiving signal HIGH");
                     return true;
