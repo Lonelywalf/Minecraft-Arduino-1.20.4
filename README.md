@@ -14,7 +14,7 @@ Please note that this is my first mod and I'm still learning how to make mods, s
 ## How to use
 
 ### Upload the sketch
-Uploaded the provided [sketch](arduino/example.ino) to your Arduino, and connect the pins like this:
+Upload the provided [sketch](arduino/example.ino) to your Arduino, and connect the pins like this:
 
 ![image](arduino/circuit.png)
 
@@ -35,4 +35,4 @@ When you use input, the mod will send a signal to the Arduino everytime the bloc
 When you use output, the mod will read if the pin is high or low and send a redstone signal to the block.
 
 
-TODO: make proper README.md, add Arduino Sketch
+TODO: make proper README.md
