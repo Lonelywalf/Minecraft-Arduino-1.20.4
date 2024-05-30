@@ -17,6 +17,7 @@ public class SerialCom {
 
     // set up the serial port
     public SerialCom(String port, int baudrate) {
+
         this.comPort = SerialPort.getCommPort(port);
         comPort.setComPortParameters(baudrate, 8, 1, 0);
         comPort.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 0, 0);
@@ -30,6 +31,7 @@ public class SerialCom {
             Chat.sendMessage("§cSomething went wrong, the inputted port might be wrong");
             isOpened = false;
         }
+
     }
 
     // write to the serial port
