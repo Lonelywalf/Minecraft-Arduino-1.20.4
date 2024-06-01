@@ -6,10 +6,7 @@ import net.jamicah.arduinocraft.Chat;
 import net.jamicah.arduinocraft.arduino.SerialCom;
 import net.jamicah.arduinocraft.block.custom.entity.Arduino_BlockEntity;
 import net.jamicah.arduinocraft.block.custom.entity.ModBlockEntities;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.BlockWithEntity;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
@@ -35,6 +32,7 @@ public class Arduino_Block extends BlockWithEntity {
         return true;
     }
 
+
     @Override
     public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.MODEL;
@@ -42,17 +40,17 @@ public class Arduino_Block extends BlockWithEntity {
 
     @Override
     public int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
-        // this checks if the block is receiving redstone power
 
         if (SerialCom.isReceivingInput) {
             return 15;
         }
         return 0;
-    }
 
+    }
+    // this checks if the block is receiving redstone power and writes signal to the arduino
     @Override
     public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
-        // this checks if the block is receiving redstone power
+
             // if it is receiving redstone power while port is opened
         if (world.isReceivingRedstonePower(pos) && SerialCom.isOpened && isInput) {
             SerialCom.digitalWrite(Arduinocraft.comPort.comPort, 1);

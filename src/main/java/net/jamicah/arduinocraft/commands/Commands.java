@@ -2,26 +2,20 @@ package net.jamicah.arduinocraft.commands;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.jamicah.arduinocraft.Arduinocraft;
 import net.jamicah.arduinocraft.arduino.SerialCom;
 import net.jamicah.arduinocraft.block.custom.Arduino_Block;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
-import net.minecraft.world.World;
 
-
-import static com.mojang.brigadier.builder.RequiredArgumentBuilder.argument;
-import static net.minecraft.server.command.CommandManager.callWithContext;
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class Commands {
     public static void registerCommands() {
 
-        // /serial start <port name>
+        // /arduino start <port> <output/input> <baudrate>
+        // /arduino stop
         CommandRegistrationCallback.EVENT.register(((dispatcher, registryAccess, environment) -> dispatcher.register(literal("arduino")
                         .executes(context -> {
                             if (!SerialCom.isReceivingInput) {
@@ -43,7 +37,7 @@ public class Commands {
                                                             if (!SerialCom.isOpened) {
                                                                 final Integer baudrate = IntegerArgumentType.getInteger(context, "Baudrate");
                                                                 final String input = StringArgumentType.getString(context, "select port");
-                                                                context.getSource().sendFeedback(() -> Text.literal("[ArduinoCraft] §oSelected \'" + input + "\' with the baudrate of " + baudrate), false);
+                                                                context.getSource().sendFeedback(() -> Text.literal("[ArduinoCraft] §oSelected '" + input + "' with the baudrate of " + baudrate), false);
                                                                 Arduinocraft.comPort = new SerialCom(input, baudrate);
 
                                                             } else {
@@ -61,7 +55,7 @@ public class Commands {
                                                     if (!SerialCom.isOpened) {
                                                         final Integer baudrate = IntegerArgumentType.getInteger(context, "Baudrate");
                                                         final String input = StringArgumentType.getString(context, "select port");
-                                                        context.getSource().sendFeedback(() -> Text.literal("[ArduinoCraft] §oSelected \'" + input + "\' with the baudrate of " + baudrate), false);
+                                                        context.getSource().sendFeedback(() -> Text.literal("[ArduinoCraft] §oSelected '" + input + "' with the baudrate of " + baudrate), false);
                                                         Arduinocraft.comPort = new SerialCom(input, baudrate);
 
                                                     } else {
@@ -75,6 +69,7 @@ public class Commands {
                             if (SerialCom.isOpened) {
                                 SerialCom.closePort(Arduinocraft.comPort.comPort);
                                 context.getSource().sendFeedback(() -> Text.literal("[ArduinoCraft] §aClosed Arduino communication"), false);
+                                SerialCom.hasSentArduinoMessage = false;
                                 return 1;
                             } else {
                                 context.getSource().sendFeedback(() -> Text.literal("[ArduinoCraft] §cError. Arduino communication wasn't started, so it can't be stopped"), false);

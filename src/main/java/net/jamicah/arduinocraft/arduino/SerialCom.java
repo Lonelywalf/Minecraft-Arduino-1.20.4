@@ -49,7 +49,7 @@ public class SerialCom {
     }
 
 
-
+    // reads the serial port
     public static Boolean digitalRead(InputStream in) {
         int read;
 
@@ -72,6 +72,8 @@ public class SerialCom {
         return null;
     }
 
+
+    // close the serial port
     public static void closePort(SerialPort comPort) {
         if (comPort.closePort()) {
             Arduinocraft.LOGGER.info("Successfully closed Serial Communication");

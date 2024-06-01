@@ -8,8 +8,7 @@ Please note that this is my first mod, and I'm still learning how to make mods, 
 - Convert real life signals to redstone with ```digitalRead()```
 
 ### TODO:
-- A menu for selecting a pin
-- Another menu for closing/opening communication with Arduino
+- A GUI menu for closing/opening communication with Arduino
 
 ## How to use
 
