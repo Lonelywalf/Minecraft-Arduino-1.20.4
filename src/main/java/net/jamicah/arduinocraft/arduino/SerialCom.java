@@ -13,7 +13,9 @@ public class SerialCom {
     public InputStream comPortIn;
     public static Boolean isOpened = false;
     public static Boolean isReceivingInput = false;
+    public static int analogSignal = 0;
     public static Boolean hasSentArduinoMessage = false;
+    public static StringBuilder messageBuffer = new StringBuilder();
 
     // set up the serial port
     public SerialCom(String port, int baudrate) {
@@ -49,7 +51,7 @@ public class SerialCom {
     }
 
 
-    // reads the serial port
+    // reads the serial port (digital)
     public static Boolean digitalRead(InputStream in) {
         int read;
 
@@ -72,6 +74,36 @@ public class SerialCom {
         return null;
     }
 
+    // reads the serial port (analog)
+    // FIXME: Minecraft tick too slow to read analog signal
+    public static void analogRead() {
+        InputStream in = Arduinocraft.comPort.comPortIn;
+        int read;
+        char readChar;
+        String message = "0";
+        try {
+            if (in.available() > 0) {
+                read = in.read();
+                readChar = (char) read;
+                messageBuffer.append(readChar);
+
+                if (readChar == '\n') {
+                    // Process the complete message (excluding the delimiter)
+                    message = messageBuffer.toString().trim();
+                    System.out.println(message);
+
+                    // Reset the buffer for the next message
+                    messageBuffer.setLength(0);
+
+
+                    SerialCom.analogSignal = Integer.parseInt(message)-3; // subtracting 3 because the arduino sends the value +3
+                }
+            }
+        } catch (IOException e) {
+            Chat.sendMessage("§cAn error has occurred while trying to read Arduino's signal");
+        }
+
+    }
 
     // close the serial port
     public static void closePort(SerialPort comPort) {

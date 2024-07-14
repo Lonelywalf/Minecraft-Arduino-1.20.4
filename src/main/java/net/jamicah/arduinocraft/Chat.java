@@ -7,7 +7,10 @@ public class Chat {
     // send messages to chat, but easier and shorter
     public static void sendMessage(String message) {
         if (MinecraftClient.getInstance().player != null) {
-            MinecraftClient.getInstance().player.sendMessage(Text.literal("§f[ArduinoCraft]§r " + message), false);
+            MinecraftClient.getInstance().player.sendMessage(
+                    Text.literal("§f[ArduinoCraft]§r " + message
+                    ), false
+            );
         }
     }
 }

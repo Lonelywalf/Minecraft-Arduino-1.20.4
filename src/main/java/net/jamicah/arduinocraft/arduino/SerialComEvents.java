@@ -13,11 +13,13 @@ public class SerialComEvents implements ClientTickEvents.EndWorldTick, ServerLif
     // Read the input from the arduino every tick and changes the redstone signal accordingly
     @Override
     public void onEndTick(ClientWorld world) {
-        if (SerialCom.isOpened && !Arduino_Block.isInput) {
+        if (SerialCom.isOpened && !Arduino_Block.isInput && Arduino_Block.isDigital) {
             Boolean isReceiving = SerialCom.digitalRead(Arduinocraft.comPort.comPortIn);
             if (isReceiving != null) {
                 SerialCom.isReceivingInput = isReceiving;
             }
+        } else if (SerialCom.isOpened && !Arduino_Block.isInput && Arduino_Block.isAnalog) {
+            SerialCom.analogRead();
         }
 
     }

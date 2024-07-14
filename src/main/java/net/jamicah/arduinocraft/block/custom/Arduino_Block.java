@@ -18,6 +18,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class Arduino_Block extends BlockWithEntity {
     public static Boolean isInput = null;
+    public static Boolean isDigital = null;
+    public static Boolean isAnalog = null;
     public Arduino_Block(Settings settings) {
         super(settings);
     }
@@ -40,11 +42,14 @@ public class Arduino_Block extends BlockWithEntity {
 
     @Override
     public int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
-
+        /*
         if (SerialCom.isReceivingInput) {
             return 15;
         }
-        return 0;
+        */
+
+        return SerialCom.analogSignal;
+
 
     }
     // this checks if the block is receiving redstone power and writes signal to the arduino
@@ -61,7 +66,10 @@ public class Arduino_Block extends BlockWithEntity {
 
             // if receiving redstone power when port isn't opened
         } else if (world.isReceivingRedstonePower(pos) && !SerialCom.isOpened && !SerialCom.hasSentArduinoMessage) {
-            Chat.sendMessage("§cArduino communication is disabled. Enable it by using /arduino start <port> <input/output> <baudrate>");
+            Chat.sendMessage(
+                    "§cArduino communication is disabled." +
+                            " Enable it by using /arduino start <port> <input/output> <baudrate>"
+            );
             SerialCom.hasSentArduinoMessage = true;
         }
 
