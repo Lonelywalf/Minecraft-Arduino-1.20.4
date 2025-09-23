@@ -1,4 +1,8 @@
 #include <Arduino.h>
+#define SEND_HIGH "3" // value to send a ON output signal
+#define SEND_LOW "4" // value to send a OFF output signal
+#define RECEIVE_HIGH "1" // value received if an ON redstone signal is received
+#define RECEIVE_LOW "0" // value received if an OFF redstone signal is received
 
 byte input;
 int buttonState = 0;
@@ -42,7 +46,7 @@ void loop() {
     // so change when the redstone signal changes to ON
     if (buttonState == LOW) {
     
-      Serial.print("3");
+      Serial.print(SEND_HIGH);
 
     }
 
@@ -50,7 +54,7 @@ void loop() {
     // so change when the redstone signal changes to OFF
     else if (buttonState == HIGH) {   // button released
 
-      Serial.print("4");  // send a different signal when the button is not held down
+      Serial.print(SEND_LOW);  // send a different signal when the button is not held down
     
     }
 
@@ -72,7 +76,7 @@ void loop() {
   // and cannot be used. The arduino will send the value to the mod through Serial
   // and the mod will change the outputted redstone signal to the value received.
 
-  /*
+  /* ! uncomment to use and comment everything else !
   // read the potentiometer value
   potentiometerValue = analogRead(A0);
 
@@ -88,16 +92,16 @@ void loop() {
     lastPotState = potentiometerValue;
   }
   //-----------------------------------------------------------------------------------
-  */
+  ! uncomment to use ! */
 
 
 
 
   //---------------- convert minecraft redstone signal to arduino signal --------------
   // how it works:
-  // when the block receives a redstone signal, it will send '1'
+  // when the block receives a redstone signal, it will send '1' (RECEIVE_HIGH)
   // to the arduino through Serial and when
-  // the redstone signal changes from on to off it will send '0'
+  // the redstone signal changes from on to off it will send '0' (RECEIVE_LOW)
   if (Serial.available() > 0) {
 
     // read the signal from minecraft mod
@@ -108,7 +112,7 @@ void loop() {
 
     // this gets run when redstone signal is received,
     // so change what will happen when redstone signal is received here
-    if (input == 1) {
+    if (input == RECEIVE_HIGH) {
 
       digitalWrite(outputPin, HIGH);
 
@@ -117,7 +121,7 @@ void loop() {
     // this gets run when the redstone signal changes
     // from on to off,
     // so change what will happen when NO redstone signal is received here 
-    else if (input == 0) {
+    else if (input == RECEIVE_LOW) {
 
       digitalWrite(outputPin, LOW);
 
