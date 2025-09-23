@@ -18,9 +18,10 @@ public class SerialComEvents implements ClientTickEvents.EndWorldTick, ServerLif
             if (isReceiving != null) {
                 SerialCom.isReceivingInput = isReceiving;
             }
-        } else if (SerialCom.isOpened && !Arduino_Block.isInput && Arduino_Block.isAnalog) {
-            SerialCom.analogRead();
         }
+//        else if (SerialCom.isOpened && !Arduino_Block.isInput && Arduino_Block.isAnalog) {
+//            SerialCom.analogRead();
+//        }
 
     }
 

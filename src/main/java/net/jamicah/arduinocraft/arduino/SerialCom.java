@@ -2,8 +2,10 @@ package net.jamicah.arduinocraft.arduino;
 
 
 import com.fazecast.jSerialComm.SerialPort;
+import com.fazecast.jSerialComm.SerialPortIOException;
 import net.jamicah.arduinocraft.Arduinocraft;
 import net.jamicah.arduinocraft.Chat;
+import net.jamicah.arduinocraft.block.custom.Arduino_Block;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -75,32 +77,35 @@ public class SerialCom {
     }
 
     // reads the serial port (analog)
-    // FIXME: Minecraft tick too slow to read analog signal
     public static void analogRead() {
-        InputStream in = Arduinocraft.comPort.comPortIn;
-        int read;
-        char readChar;
-        String message = "0";
-        try {
-            if (in.available() > 0) {
-                read = in.read();
-                readChar = (char) read;
-                messageBuffer.append(readChar);
+        while (Arduino_Block.isAnalog && isOpened) {
+            InputStream in = Arduinocraft.comPort.comPortIn;
+            int read;
+            char readChar;
+            String message;
+            try {
+                if (in.available() > 0) {
+                    read = in.read();
+                    readChar = (char) read;
+                    messageBuffer.append(readChar);
 
-                if (readChar == '\n') {
-                    // Process the complete message (excluding the delimiter)
-                    message = messageBuffer.toString().trim();
-                    System.out.println(message);
+                    if (readChar == '\n') {
+                        // Process the complete message (excluding the delimiter)
+                        message = messageBuffer.toString().trim();
 
-                    // Reset the buffer for the next message
-                    messageBuffer.setLength(0);
+                        // Reset the buffer for the next message
+                        messageBuffer.setLength(0);
 
-
-                    SerialCom.analogSignal = Integer.parseInt(message)-3; // subtracting 3 because the arduino sends the value +3
+                        // subtracting 3 because the arduino sends the value + 3
+                        SerialCom.analogSignal = Integer.parseInt(message) - 3;
+                    }
                 }
+            } catch (SerialPortIOException ignored) {
+
+            } catch (IOException e) {
+                Chat.sendMessage("§cAn error has occurred while trying to read Arduino's signal");
+                Chat.sendMessage("§cDebug info: " + e);
             }
-        } catch (IOException e) {
-            Chat.sendMessage("§cAn error has occurred while trying to read Arduino's signal");
         }
 
     }

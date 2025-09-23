@@ -60,7 +60,10 @@ public class Commands {
                                                                         final Integer baudrate = IntegerArgumentType.getInteger(context, "baudrate");
                                                                         final String input = StringArgumentType.getString(context, "select port");
                                                                         context.getSource().sendFeedback(() -> Text.literal(
-                                                                                        "[ArduinoCraft] §oSelected '" + input + "' with the baudrate of " + baudrate),
+                                                                                        "[ArduinoCraft] §oSelected '"
+                                                                                                + input
+                                                                                                + "' with the baudrate of "
+                                                                                                + baudrate),
                                                                                 false
                                                                         );
                                                                         Arduinocraft.comPort = new SerialCom(input, baudrate);
@@ -74,6 +77,9 @@ public class Commands {
                                                                     Arduino_Block.isAnalog = true;
                                                                     Arduino_Block.isDigital = false;
                                                                     Arduino_Block.isInput = false;
+                                                                    // start thread for the method analogRead()
+                                                                    Thread analogThread = new Thread(SerialCom::analogRead);
+                                                                    analogThread.start();
                                                                     return 1;
                                                                 })
                                                         )
@@ -114,6 +120,10 @@ public class Commands {
                                         false
                                 );
                                 SerialCom.hasSentArduinoMessage = false;
+                                SerialCom.isOpened = false;
+                                Arduino_Block.isInput = false;
+                                Arduino_Block.isDigital = false;
+                                Arduino_Block.isAnalog = false;
                             } else {
                                 context.getSource().sendFeedback(() -> Text.literal(
                                         "[ArduinoCraft] §cError. Arduino communication wasn't started, so it can't be stopped"),
