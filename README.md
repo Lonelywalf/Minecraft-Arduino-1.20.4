@@ -1,7 +1,7 @@
 # ArduinoCraft
 A Minecraft Fabric mod that allows redstone signals to interact with an Arduino and vice versa.
 
-Please note that this is my first mod, and I'm still learning how to make mods, so there might be some bugs or issues.
+Please note that this is my first mod, and I'm still learning how to make mods, so there might be some bugs or issues. If you have any issues or questions, DM me on Discord **@jamicah**.
 
 ## Features
 - An "Arduino Block" which takes redstone signals and converts it to `digitalWrite()`
