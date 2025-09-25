@@ -1,8 +1,8 @@
 #include <Arduino.h>
-#define SEND_HIGH "3" // value to send a ON output signal
-#define SEND_LOW "4" // value to send a OFF output signal
-#define RECEIVE_HIGH "1" // value received if an ON redstone signal is received
-#define RECEIVE_LOW "0" // value received if an OFF redstone signal is received
+#define SEND_HIGH 3 // value to send a ON output signal
+#define SEND_LOW 4 // value to send a OFF output signal
+#define RECEIVE_HIGH 1 // value received if an ON redstone signal is received
+#define RECEIVE_LOW 0 // value received if an OFF redstone signal is received
 
 byte input;
 int buttonState = 0;
