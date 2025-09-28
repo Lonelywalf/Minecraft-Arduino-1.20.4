@@ -65,7 +65,7 @@ void loop() {
 
 
 
-
+  // do not use... it is not implemented in the mod (yet)...
   //--------- convert arduino signal to minecraft redstone signal (analog) ------------
   // usage:
   // for (irl) components that have a range of values like a potentiometer
