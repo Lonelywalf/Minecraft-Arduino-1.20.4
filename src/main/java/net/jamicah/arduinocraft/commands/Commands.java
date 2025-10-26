@@ -14,7 +14,8 @@ import static net.minecraft.server.command.CommandManager.literal;
 public class Commands {
     public static void registerCommands() {
 
-        // /arduino start <port> <output/input> <baudrate>
+        // /arduino start <port> output <analog/digital> <baudrate>
+        // /arduino start <port> input <baudrate>
         // /arduino stop
         CommandRegistrationCallback.EVENT.register(((dispatcher, registryAccess, environment) ->
                 dispatcher.register(literal("arduino")
