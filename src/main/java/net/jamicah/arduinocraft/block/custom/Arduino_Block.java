@@ -17,9 +17,9 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 public class Arduino_Block extends BlockWithEntity {
-    public static Boolean isInput = null;
-    public static Boolean isDigital = null;
-    public static Boolean isAnalog = null;
+    public static Boolean isInput = false;
+    public static Boolean isDigital = false;
+    public static Boolean isAnalog = false;
     public Arduino_Block(Settings settings) {
         super(settings);
     }
@@ -40,15 +40,26 @@ public class Arduino_Block extends BlockWithEntity {
         return BlockRenderType.MODEL;
     }
 
+    // this gets the redstone power level to output to adjacent blocks
     @Override
     public int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
-        /*
-        if (SerialCom.isReceivingInput) {
-            return 15;
+        // If the block is configured to output digital signals from the Arduino to Minecraft
+        if (Boolean.TRUE.equals(isDigital) && !Boolean.TRUE.equals(isInput)) {
+            int power = Boolean.TRUE.equals(SerialCom.isReceivingInput) ? 15 : 0;
+            Arduinocraft.LOGGER.debug("Arduino_Block.getWeakRedstonePower (digital) at " + pos + " -> " + power);
+            return power;
         }
-        */
 
-        return SerialCom.analogSignal;
+        // If the block is configured to output analog signals from the Arduino to Minecraft
+        if (Boolean.TRUE.equals(isAnalog) && !Boolean.TRUE.equals(isInput)) {
+            int power = SerialCom.analogSignal;
+            Arduinocraft.LOGGER.debug("Arduino_Block.getWeakRedstonePower (analog) at " + pos + " -> " + power);
+            return power;
+        }
+
+        // Default: no redstone power (e.g., block is in input mode or not configured)
+        Arduinocraft.LOGGER.debug("Arduino_Block.getWeakRedstonePower (default) at " + pos + " -> 0");
+        return 0;
 
 
     }
@@ -56,12 +67,12 @@ public class Arduino_Block extends BlockWithEntity {
     @Override
     public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
 
-            // if it is receiving redstone power while port is opened
-        if (world.isReceivingRedstonePower(pos) && SerialCom.isOpened && isInput) {
+            // if it is receiving redstone power while port is opened and the block is in input mode (Minecraft->Arduino)
+        if (world.isReceivingRedstonePower(pos) && SerialCom.isOpened && Boolean.TRUE.equals(isInput)) {
             SerialCom.digitalWrite(Arduinocraft.comPort.comPort, 1);
 
             // if not receiving redstone power while port is opened
-        } else if (!world.isReceivingRedstonePower(pos) && SerialCom.isOpened && isInput) {
+        } else if (!world.isReceivingRedstonePower(pos) && SerialCom.isOpened && Boolean.TRUE.equals(isInput)) {
             SerialCom.digitalWrite(Arduinocraft.comPort.comPort, 0);
 
             // if receiving redstone power when port isn't opened
@@ -87,5 +98,12 @@ public class Arduino_Block extends BlockWithEntity {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
         return validateTicker(type, ModBlockEntities.ARDUINO_BLOCK_ENTITY, (world1, pos, state1, blockEntity) -> blockEntity.tick(world1, pos, state1, blockEntity));
+    }
+
+    @Override
+    public int getStrongRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
+        int power = getWeakRedstonePower(state, world, pos, direction);
+        Arduinocraft.LOGGER.debug("Arduino_Block.getStrongRedstonePower at " + pos + " -> " + power);
+        return power;
     }
 }

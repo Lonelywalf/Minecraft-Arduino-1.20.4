@@ -37,7 +37,12 @@ public class Commands {
                                                                                         "[ArduinoCraft] §oSelected '" + input + "' with the baudrate of " + baudrate),
                                                                                 false
                                                                         );
-                                                                        Arduinocraft.comPort = new SerialCom(input, baudrate);
+                                                                        try {
+                                                                            Arduinocraft.comPort = new SerialCom(input, baudrate);
+                                                                        } catch (Exception e) {
+                                                                            context.getSource().sendError(Text.literal("[ArduinoCraft] §cFailed to open port: " + e.getMessage()));
+                                                                            return 0;
+                                                                        }
 
                                                                     } else {
                                                                         context.getSource().sendFeedback(() -> Text.literal(
@@ -57,7 +62,7 @@ public class Commands {
 
                                                                     // open selected port & make the block OUTPUT only (Arduino to Minecraft)
                                                                     if (!SerialCom.isOpened) {
-                                                                        final Integer baudrate = IntegerArgumentType.getInteger(context, "baudrate");
+                                                                        final int baudrate = IntegerArgumentType.getInteger(context, "baudrate");
                                                                         final String input = StringArgumentType.getString(context, "select port");
                                                                         context.getSource().sendFeedback(() -> Text.literal(
                                                                                         "[ArduinoCraft] §oSelected '"
@@ -66,7 +71,12 @@ public class Commands {
                                                                                                 + baudrate),
                                                                                 false
                                                                         );
-                                                                        Arduinocraft.comPort = new SerialCom(input, baudrate);
+                                                                        try {
+                                                                            Arduinocraft.comPort = new SerialCom(input, baudrate);
+                                                                        } catch (Exception e) {
+                                                                            context.getSource().sendError(Text.literal("[ArduinoCraft] §cFailed to open port: " + e.getMessage()));
+                                                                            return 0;
+                                                                        }
 
                                                                     } else {
                                                                         context.getSource().sendFeedback(() -> Text.literal(
@@ -77,16 +87,14 @@ public class Commands {
                                                                     Arduino_Block.isAnalog = true;
                                                                     Arduino_Block.isDigital = false;
                                                                     Arduino_Block.isInput = false;
-                                                                    // start thread for the method analogRead()
-                                                                    Thread analogThread = new Thread(SerialCom::analogRead);
-                                                                    analogThread.start();
+                                                                    // SerialCom now starts a dedicated reader thread on construction which handles analog reads
                                                                     return 1;
                                                                 })
                                                         )
                                                 )
                                         )
                                 .then(literal("input")
-                                        .then(CommandManager.argument("Baudrate", IntegerArgumentType.integer())
+                                        .then(CommandManager.argument("baudrate", IntegerArgumentType.integer())
                                                 .executes(context -> {
 
                                                     // open selected port & make the block OUTPUT only (Arduino to Minecraft)
@@ -97,7 +105,12 @@ public class Commands {
                                                                 "[ArduinoCraft] §oSelected '" + input + "' with the baudrate of " + baudrate),
                                                                 false
                                                         );
-                                                        Arduinocraft.comPort = new SerialCom(input, baudrate);
+                                                        try {
+                                                            Arduinocraft.comPort = new SerialCom(input, baudrate);
+                                                        } catch (Exception e) {
+                                                            context.getSource().sendError(Text.literal("[ArduinoCraft] §cFailed to open port: " + e.getMessage()));
+                                                            return 0;
+                                                        }
 
                                                     } else {
                                                         context.getSource().sendFeedback(() -> Text.literal(

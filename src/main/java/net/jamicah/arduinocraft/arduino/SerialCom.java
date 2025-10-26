@@ -14,29 +14,44 @@ public class SerialCom {
     public SerialPort comPort;
     public InputStream comPortIn;
     public static Boolean isOpened = false;
-    public static Boolean isReceivingInput = false;
-    public static int analogSignal = 0;
+    public static volatile Boolean isReceivingInput = false;
+    public static volatile int analogSignal = 0;
     public static Boolean hasSentArduinoMessage = false;
     public static StringBuilder messageBuffer = new StringBuilder();
+
+    // instance-level reader thread
+    private Thread readerThread;
 
     // set up the serial port
     public SerialCom(String port, int baudrate) {
 
         this.comPort = SerialPort.getCommPort(port);
         comPort.setComPortParameters(baudrate, 8, 1, 0);
-        comPort.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 0, 0);
-
-        comPortIn = comPort.getInputStream();
+        // Use non-blocking read mode so available()/read() won't block
+        comPort.setComPortTimeouts(SerialPort.TIMEOUT_NONBLOCKING, 0, 0);
 
         if (comPort.openPort()) {
+            try {
+                comPortIn = comPort.getInputStream();
+            } catch (Exception e) {
+                Chat.sendMessage("§cFailed to get input stream: " + e.getMessage());
+                isOpened = false;
+                return;
+            }
             Chat.sendMessage("§aCommunication successfully started");
             isOpened = true;
+
+            // start instance reader thread to process incoming serial data
+            readerThread = new Thread(this::readerLoop, "Arduino-Serial-Reader");
+            readerThread.setDaemon(true);
+            readerThread.start();
         } else {
             Chat.sendMessage("§cSomething went wrong, the inputted port might be wrong");
             isOpened = false;
         }
 
     }
+
 
     // write to the serial port
     public static void digitalWrite(SerialPort com, Integer signal) {
@@ -52,66 +67,128 @@ public class SerialCom {
         }
     }
 
+    // continuous reader loop that handles both digital (3/4) and analog (line-terminated) messages
+    private void readerLoop() {
+        Arduinocraft.LOGGER.info("SerialCom.readerLoop started");
+        try {
+            while (isOpened && comPortIn != null) {
+                try {
+                    // read all available bytes
+                    while (comPortIn.available() > 0) {
+                        int b = comPortIn.read();
+                        if (b == -1) break;
+                        Arduinocraft.LOGGER.debug("SerialCom.readerLoop raw byte: " + b);
 
-    // reads the serial port (digital)
+                        // handle newline-terminated analog messages
+                        if (b == '\n') {
+                            String msg;
+                            synchronized (messageBuffer) {
+                                msg = messageBuffer.toString().trim();
+                                messageBuffer.setLength(0);
+                            }
+                            if (!msg.isEmpty()) {
+                                try {
+                                    int parsed = Integer.parseInt(msg);
+                                    // analog payload is value + 3 (per Arduino sketch)
+                                    int computed = parsed - 3;
+                                    // clamp to redstone range 0..15
+                                    int clamped = Math.max(0, Math.min(computed, 15));
+                                    analogSignal = clamped;
+                                    Arduinocraft.LOGGER.info("SerialCom.readerLoop parsed analog value: " + computed + " -> clamped: " + analogSignal);
+                                } catch (NumberFormatException nfe) {
+                                    Arduinocraft.LOGGER.warn("SerialCom.readerLoop failed to parse analog message: '" + msg + "'");
+                                }
+                            }
+                        } else if (b == 3 || b == 4 || b == 51 || b == 52) {
+                            // digital raw 3/4 or ascii '3'/'4'
+                            if (Boolean.TRUE.equals(Arduino_Block.isDigital) && !Boolean.TRUE.equals(Arduino_Block.isInput)) {
+                                if (b == 3 || b == 51) {
+                                    isReceivingInput = true;
+                                    Arduinocraft.LOGGER.info("SerialCom.readerLoop detected DIGITAL HIGH");
+                                } else if (b == 4 || b == 52) {
+                                    isReceivingInput = false;
+                                    Arduinocraft.LOGGER.info("SerialCom.readerLoop detected DIGITAL LOW");
+                                }
+                            } else {
+                                // If not digital mode, nevertheless append to buffer for analog parsing if numeric
+                                synchronized (messageBuffer) {
+                                    messageBuffer.append((char) b);
+                                }
+                            }
+                        } else {
+                            // append any other bytes to buffer for potential analog numeric messages
+                            synchronized (messageBuffer) {
+                                messageBuffer.append((char) b);
+                            }
+                        }
+                    }
+
+                    Thread.sleep(2);
+                } catch (IOException e) {
+                    Arduinocraft.LOGGER.error("Error reading serial input", e);
+                    break;
+                } catch (InterruptedException ie) {
+                    break;
+                }
+            }
+        } finally {
+            Arduinocraft.LOGGER.info("SerialCom.readerLoop stopped");
+        }
+    }
+
+    // legacy digitalRead kept for compatibility (not used by readerThread)
     public static Boolean digitalRead(InputStream in) {
-        int read;
+        if (in == null) {
+            Arduinocraft.LOGGER.warn("SerialCom.digitalRead called with null InputStream");
+            return null;
+        }
 
         try {
             if (in.available() > 0) {
-                read = in.read();
-                if (read == 51) {
-                    Arduinocraft.LOGGER.info("receiving signal HIGH");
+                int read = in.read();
+                if (read == -1) {
+                    // end of stream
+                    return null;
+                }
+                Arduinocraft.LOGGER.info("SerialCom.digitalRead raw byte: " + read);
+                if (read == 3 || read == 51) {
                     return true;
-                } else if (read == 52) {
-                    Arduinocraft.LOGGER.info("receiving signal LOW");
+                } else if (read == 4 || read == 52) {
                     return false;
                 }
-
-
             }
         } catch (IOException e) {
             Chat.sendMessage("§cAn error has occurred while trying to read Arduino's signal");
+            Arduinocraft.LOGGER.error("Error reading from serial input stream", e);
         }
         return null;
     }
 
     // reads the serial port (analog)
+    @Deprecated
     public static void analogRead() {
+        Arduinocraft.LOGGER.info("SerialCom.analogRead() (deprecated) called — use readerThread instead");
+        // Keep backward compatibility: start a simple loop that waits for readerThread to do the work
         while (Arduino_Block.isAnalog && isOpened) {
-            InputStream in = Arduinocraft.comPort.comPortIn;
-            int read;
-            char readChar;
-            String message;
             try {
-                if (in.available() > 0) {
-                    read = in.read();
-                    readChar = (char) read;
-                    messageBuffer.append(readChar);
-
-                    if (readChar == '\n') {
-                        // Process the complete message (excluding the delimiter)
-                        message = messageBuffer.toString().trim();
-
-                        // Reset the buffer for the next message
-                        messageBuffer.setLength(0);
-
-                        // subtracting 3 because the arduino sends the value + 3
-                        SerialCom.analogSignal = Integer.parseInt(message) - 3;
-                    }
-                }
-            } catch (SerialPortIOException ignored) {
-
-            } catch (IOException e) {
-                Chat.sendMessage("§cAn error has occurred while trying to read Arduino's signal");
-                Chat.sendMessage("§cDebug info: " + e);
+                Thread.sleep(50);
+            } catch (InterruptedException ignored) {
+                break;
             }
         }
-
     }
 
     // close the serial port
     public static void closePort(SerialPort comPort) {
+        // stop reader thread if running
+        try {
+            if (Arduinocraft.comPort != null && Arduinocraft.comPort.readerThread != null) {
+                Arduinocraft.comPort.readerThread.interrupt();
+                Arduinocraft.comPort.readerThread = null;
+            }
+        } catch (Exception ignored) {
+        }
+
         if (comPort.closePort()) {
             Arduinocraft.LOGGER.info("Successfully closed Serial Communication");
             isOpened = false;

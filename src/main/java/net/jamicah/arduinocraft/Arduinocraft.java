@@ -4,6 +4,7 @@ import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.jamicah.arduinocraft.arduino.SerialCom;
 import net.jamicah.arduinocraft.block.ModBlocks;
 import net.jamicah.arduinocraft.block.custom.entity.ModBlockEntities;
@@ -26,6 +27,7 @@ public class Arduinocraft implements ModInitializer {
 		ModBlockEntities.registerModBlockEntities();
 
 		ClientTickEvents.END_WORLD_TICK.register(new SerialComEvents());
+		ServerTickEvents.END_WORLD_TICK.register(new SerialComEvents());
 
 		ServerLifecycleEvents.SERVER_STOPPED.register(new SerialComEvents());
 
