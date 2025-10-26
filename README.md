@@ -13,9 +13,8 @@ Please note that this is my first mod, and I'm still learning how to make mods, 
 ## How to use
 
 ### Upload a sketch
-You can upload [the template sketch](arduino/example.ino) to your Arduino device via Arduno IDE (or whatever you use ig). The schematic below is used for the template sketch:
+You can choose an [example sketch](arduino/example) and upload it to your Arduino using the Arduino IDE (or whatever you use to upload ig). I'd recommend starting with the [digitalRead/digitalWrite example](arduino/example/digital_read_receive_example) to see how the communication works.
 
-![image](arduino/circuit.png)
 
 ### Start
 In Minecraft, place down the Arduino Block (from the redstone creative menu), 
