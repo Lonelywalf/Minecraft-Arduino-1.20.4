@@ -3,9 +3,9 @@ A Minecraft Fabric mod that allows redstone signals to interact with an Arduino 
 
 Please note that this was my first mod, and I'm still learning how to make mods, so there might be some bugs or issues. If you have any issues or questions, DM me on Discord **@jamicah**.
 
-NOTE: This mod requires a bit of knowledge about Arduino and Serial communication. If you are new to Arduino, I recommend checking out tutorials on Arduino and Serial communication first.
+This mod is not only limited to Arduino. It *should* work with any microcontroller that supports Serial UART communication over USB.
 
-This mod is not only limited to Arduino. It should work with any microcontroller that supports Serial UART communication over USB.
+NOTE: This mod requires a bit of knowledge about Arduino and Serial communication. If you are new to Arduino, I recommend checking out tutorials on Arduino and Serial communication first.
 
 ## Features
 - Convert redstone signals to Arduino digital signals
